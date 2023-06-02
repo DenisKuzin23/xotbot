@@ -1,0 +1,1 @@
+from .xobot import dp
