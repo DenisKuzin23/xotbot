@@ -13,6 +13,7 @@ pf = PlayField()
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
     global move
+    global users
     if len(users) < 1:
         msg = await bot.send_message(message.from_user.id, 'Игра крестики-нолики, ждем второго игрока')
         users.append((message.from_user.id, msg))
@@ -63,6 +64,7 @@ async def btn33_clicked(query: types.CallbackQuery):
 
 async def move_done(query: types.CallbackQuery, x: int, y: int):
     global move
+    global users
     if (query.from_user.id == users[0][0]) and move == 0:
         await users[0][1].edit_reply_markup(pf.change_x_state(x, y))
         await users[1][1].edit_reply_markup(pf.change_x_state(x, y))
@@ -71,3 +73,21 @@ async def move_done(query: types.CallbackQuery, x: int, y: int):
         await users[0][1].edit_reply_markup(pf.change_o_state(x, y))
         await users[1][1].edit_reply_markup(pf.change_o_state(x, y))
         move = 0
+    if pf.check_win() == 1:
+        await users[0][1].edit_text('Вы выиграли!!!')
+        await users[1][1].edit_text('Вы проиграли...')
+        move = -1
+        users = []
+        pf.reset()
+    elif pf.check_win() == 2:
+        await users[0][1].edit_text('Вы проиграли...')
+        await users[1][1].edit_text('Вы выиграли!!!')
+        move = -1
+        users = []
+        pf.reset()
+    elif pf.check_win() == 3:
+        await users[0][1].edit_text('Ничья')
+        await users[1][1].edit_text('Ничья')
+        move = -1
+        users = []
+        pf.reset()

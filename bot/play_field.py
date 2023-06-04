@@ -5,12 +5,15 @@ from typing import List
 class PlayField:
     
     def __init__(self):
-        self._battle_field = [['.', '.', '.'],
-                              ['.', '.', '.'],
-                              ['.', '.', '.']]
+        self._generate_battle_field()
         self._keyboard_markup = InlineKeyboardMarkup(inline_keyboard=self._generate_buttons())
         self._states_changed: List[str] = []
     
+    def _generate_battle_field(self):
+        self._battle_field = [['.', '.', '.'],
+                              ['.', '.', '.'],
+                              ['.', '.', '.']]
+
     def _generate_buttons(self):
         buttons = []
         for x in range(3):
@@ -40,12 +43,25 @@ class PlayField:
             return self._keyboard_markup
 
     def check_win(self) -> int:
+        if len(self._states_changed) == 9:
+            return 3
+        if self._check_win_by('X'): return 1
+        if self._check_win_by('O'): return 2
+    
+    def _check_win_by(self, sym: str) -> bool:
         bf = self._battle_field
-        if ((bf[0][0] == 'X' and bf[0][1] == 'X' and bf[0][2] == 'X') 
-            or (bf[1][0] == 'X' and bf[1][1] == 'X' and bf[1][2] == 'X')
-            or (bf[2][0] == 'X' and bf[2][1] == 'X' and bf[2][2] == 'X')
-            or (bf[0][0] == 'X' and bf[1][0] == 'X' and bf[2][0] == 'X')
-            or (bf[0][1] == 'X' and bf[1][1] == 'X' and bf[2][1] == 'X')
-            or (bf[0][2] == 'X' and bf[1][2] == 'X' and bf[2][2] == 'X')):
-                return 1
-        pass
+        if ((bf[0][0] == sym and bf[0][1] == sym and bf[0][2] == sym) 
+            or (bf[1][0] == sym and bf[1][1] == sym and bf[1][2] == sym)
+            or (bf[2][0] == sym and bf[2][1] == sym and bf[2][2] == sym)
+            or (bf[0][0] == sym and bf[1][0] == sym and bf[2][0] == sym)
+            or (bf[0][1] == sym and bf[1][1] == sym and bf[2][1] == sym)
+            or (bf[0][2] == sym and bf[1][2] == sym and bf[2][2] == sym)
+            or (bf[0][0] == sym and bf[1][1] == sym and bf[2][2] == sym)
+            or (bf[0][2] == sym and bf[1][1] == sym and bf[2][0] == sym)):
+                return True
+
+    def reset(self):
+        self._generate_battle_field()
+        self._keyboard_markup = InlineKeyboardMarkup(inline_keyboard=self._generate_buttons())
+        self._states_changed = []
+    
